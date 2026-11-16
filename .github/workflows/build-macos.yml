@@ -1,0 +1,32 @@
+name: Build macOS app
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - greek-translation-build
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Check translations
+        run: swift scripts/check-strings.swift
+      - name: Build universal app
+        run: scripts/build-app.sh release
+      - name: Archive app
+        run: ditto -c -k --sequesterRsrc --keepParent build/Tendedero.app build/Tendedero-macOS.zip
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tendedero-macOS
+          path: build/Tendedero-macOS.zip
+          if-no-files-found: error
+          retention-days: 14
