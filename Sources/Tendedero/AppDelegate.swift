@@ -298,7 +298,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let login = Self.shouldOfferLogin ? NSButton(checkboxWithTitle: L("Open at login"), target: nil, action: nil) : nil
         login?.state = .on
         if login != nil { Self.loginOffered() }
-        let stack = NSStackView(views: boxes + (login.map { [$0] } ?? []))
+        var accessoryViews: [NSView] = boxes
+        if let login { accessoryViews.append(login) }
+        let stack = NSStackView(views: accessoryViews)
         stack.orientation = .vertical
         stack.alignment = .leading
         stack.spacing = 6
